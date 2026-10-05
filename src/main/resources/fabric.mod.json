@@ -3,29 +3,17 @@
   "id": "minewind",
   "version": "${version}",
   "name": "Minewind",
-  "description": "Morrowind-inspired mechanics, worldfeel, and content for Fabric 1.21.1.",
-  "authors": [
-    "Minewind Team"
-  ],
-  "contact": {
-    "homepage": "https://example.com/minewind"
-  },
+  "description": "Morrowind content for Minecraft Fabric 1.21.1.",
+  "authors": ["Minewind Team"],
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": [
-      {
-        "adapter": "java",
-        "value": "com.minewind.MinewindMod"
-      }
-    ]
+    "main": ["com.minewind.MinewindMod"]
   },
-  "mixins": [
-    "minewind.mixins.json"
-  ],
   "depends": {
     "minecraft": "1.21.1",
     "fabricloader": ">=0.16.5",
-    "fabric-api": "*"
+    "fabric-api": "*",
+    "java": ">=21"
   }
 }

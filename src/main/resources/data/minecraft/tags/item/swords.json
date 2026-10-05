@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minewind:iron_dagger",
+    "minewind:steel_longsword",
+    "minewind:steel_claymore",
+    "minewind:ebony_broadsword"
+  ]
+}

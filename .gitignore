@@ -1,45 +1,5 @@
-# IDE
-.idea/
-.vscode/
-*.iml
-*.ipr
-*.iws
-
-# Build files
-/build/
-/out/
-
-# Gradle
 .gradle/
-gradlew
-gradlew.bat
-
-# Fabric Loom
-.loom/
-
-# IntelliJ
-*.iml
-.idea/
-
-# macOS
-.DS_Store
-
-# Windows
-Thumbs.db
-
-# Logs
-*.log
-logs/
-
-# Crash reports
-crash-reports/
-
-# Run files
+build/
 run/
-
-# Environment
-.env
-*.env
-
-# Dependencies
-lib/
+.idea/
+*.iml

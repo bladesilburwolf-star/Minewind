@@ -1,9 +1,8 @@
 # Minewind
-Morrowind-inspired mechanics, worldfeel, and content for Fabric 1.21.1.
+Morrowind content for Minecraft Fabric 1.21.1 (Java 21, Gradle 8.10.2, Loom 1.8).
 
-## Quick start
+Build: `gradlew.bat build` (Windows) or `./gradlew build`. Dev client: `gradlew runClient`.
 
-- Windows: `gradlew.bat build`
-- macOS/Linux: `./gradlew build`
-
-This project starts from a clean base and is designed to evolve into Morrowind terrain, weapons, armor, quests, creatures, weapons, and custom RPG systems inside Fabric 1.21.1.
+## Weapons
+Iron Dagger, Steel Longsword, Steel Claymore, Ebony Broadsword (Combat tab).
+Textures in `src/main/resources/assets/minewind/textures/item/` are placeholders; replace with PNGs from your own Morrowind install (Icons/w/*.dds converted to PNG).
