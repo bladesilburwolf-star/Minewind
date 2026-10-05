@@ -2,19 +2,15 @@ package com.minewind.mixin.render;
 
 import com.minewind.MinewindMod;
 import net.minecraft.client.render.Camera;
-import net.minecraft.world.BlockView;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Applies custom first-person camera effects after vanilla has established the
- * camera. The update signature is the 1.21.1 five-argument Camera API.
- */
 @Mixin(Camera.class)
 public abstract class CameraMixin {
     @Unique private float minewind$customYaw;
@@ -25,7 +21,7 @@ public abstract class CameraMixin {
 
     @Inject(method = "update", at = @At("TAIL"))
     private void minewind$updateCamera(BlockView area, Entity focusedEntity, boolean thirdPerson,
-                                        boolean inverseView, float tickDelta, CallbackInfo ci) {
+                                       boolean inverseView, float tickDelta, CallbackInfo ci) {
         MinewindMod mod = MinewindMod.getInstance();
         if (mod == null || focusedEntity == null || thirdPerson) return;
 
@@ -41,7 +37,7 @@ public abstract class CameraMixin {
         minewind$viewModelBobbing = (float) Math.sin((focusedEntity.age + tickDelta) * 0.35f) * intensity;
 
         MinewindMod mod = MinewindMod.getInstance();
-        if (mod.getCombatSystem().isAttacking()) {
+        if (mod != null && mod.getCombatSystem().isAttacking()) {
             float progress = mod.getCombatSystem().getAttackAnimationProgress();
             minewind$viewModelSwing = (float) Math.sin(progress * Math.PI) * 0.5f;
         } else {
