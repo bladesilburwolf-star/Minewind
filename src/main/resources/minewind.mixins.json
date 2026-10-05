@@ -2,15 +2,10 @@
   "required": true,
   "package": "com.minewind.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": [
-    "player.ClientPlayerEntityMixin",
-    "player.PlayerEntityMixin",
-    "render.CameraMixin",
-    "render.GameRendererMixin",
-    "world.ClientWorldMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  },
-  "minVersion": "0.8.5"
+  "mixins": [
+    "PlayerEntityMixin",
+    "ClientPlayerEntityMixin",
+    "CameraMixin",
+    "GameRendererMixin"
+  ]
 }

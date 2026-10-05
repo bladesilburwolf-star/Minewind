@@ -1,41 +1,31 @@
-package com.minewind.mixin.render;
+package com.minewind;
 
-import com.minewind.MinewindMod;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Mixin(GameRenderer.class)
-public abstract class GameRendererMixin {
-    @Inject(method = "getFov", at = @At("HEAD"), cancellable = true)
-    private void minewind$modifyFov(Camera camera, float tickDelta, boolean changingFov,
-                                     CallbackInfoReturnable<Double> cir) {
-        MinewindMod mod = MinewindMod.getInstance();
-        if (mod == null) return;
+public class MinewindMod implements net.fabricmc.api.ModInitializer {
+    public static final String MOD_ID = "minewind";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null) return;
+    private static MinewindMod instance;
+    private final MorrowindSystems morrowindSystems = new MorrowindSystems();
 
-        double fov = 70.0;
-        if (mod.getMovementSystem().isSneaking()) {
-            fov -= 10.0;
-        }
-        if (mod.getSpellSystem().isCasting()) {
-            fov -= mod.getSpellSystem().getCastProgress() * 20.0;
-        }
-        cir.setReturnValue(fov);
+    public MinewindMod() {
+        instance = this;
     }
 
-    @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
-    private void minewind$disableVanillaBob(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (MinewindMod.getInstance() != null) {
-            ci.cancel();
-        }
+    @Override
+    public void onInitialize() {
+        LOGGER.info("Minewind starting initialization");
+        morrowindSystems.initialize();
+        LOGGER.info("Minewind initialized successfully");
+    }
+
+    public static MinewindMod getInstance() {
+        return instance;
+    }
+
+    public MorrowindSystems getMorrowindSystems() {
+        return morrowindSystems;
     }
 }
