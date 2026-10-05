@@ -23,7 +23,6 @@ public class MovementSystem {
     private boolean isFlying;
     private boolean isSwimming;
     private boolean canJump;
-
     private Vec3d velocity;
 
     public MovementSystem() {

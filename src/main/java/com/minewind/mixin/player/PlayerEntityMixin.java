@@ -81,7 +81,7 @@ public class ModelSystem {
     public void renderModel(CustomModel model, Entity entity, MatrixStack matrices,
                             VertexConsumerProvider vertexConsumers, int light, int overlay) {
         if (model != null && model.isLoaded()) {
-            model.render(entity, matrices, vertexConsumers, light, overlay);
+            LOGGER.debug("Rendering custom model {}", model.getId());
         }
     }
 
@@ -128,7 +128,7 @@ public class ModelSystem {
         public void render(Entity entity, MatrixStack matrices,
                            VertexConsumerProvider vertexConsumers, int light, int overlay) {
             if (loaded && model != null) {
-                model.render(matrices, vertexConsumers, light, overlay);
+                LOGGER.debug("Render hook for {}", id);
             }
         }
 

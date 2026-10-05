@@ -14,17 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEntityMixin {
-    @Unique
-    private boolean minewind$wasOnGround;
-
-    @Unique
-    private float minewind$customYaw;
-
-    @Unique
-    private float minewind$customPitch;
-
-    @Unique
-    private Vec3d minewind$customVelocity = Vec3d.ZERO;
+    @Unique private boolean minewind$wasOnGround;
+    @Unique private float minewind$customYaw;
+    @Unique private float minewind$customPitch;
+    @Unique private Vec3d minewind$customVelocity = Vec3d.ZERO;
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTickStart(CallbackInfo ci) {

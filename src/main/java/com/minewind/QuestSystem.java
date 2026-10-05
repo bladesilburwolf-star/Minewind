@@ -174,10 +174,10 @@ public class InventorySystem {
     }
 
     private boolean stacksEqual(ItemStack a, ItemStack b) {
-        if (a.hasNbt() != b.hasNbt()) {
+        if ((a.getNbt() == null) != (b.getNbt() == null)) {
             return false;
         }
-        if (a.hasNbt()) {
+        if (a.getNbt() != null) {
             return a.getNbt().equals(b.getNbt());
         }
         return true;

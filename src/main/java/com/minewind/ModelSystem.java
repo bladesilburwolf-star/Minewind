@@ -43,9 +43,7 @@ public class QuestSystem {
     }
 
     public void startQuest(Quest quest) {
-        if (quest == null) {
-            return;
-        }
+        if (quest == null) return;
 
         String questId = quest.getId();
         if (activeQuests.containsKey(questId)) {
@@ -324,7 +322,6 @@ public class QuestSystem {
                 objectivesList.add(objective.saveToNbt());
             }
             nbt.put("objectives", objectivesList);
-
             return nbt;
         }
     }
