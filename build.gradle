@@ -15,20 +15,15 @@ java {
 }
 
 loom {
-    minecraftProvider.mappings(mappings: loom.layered() {
-        officialMojangMappings()
-        parchment()
-    })
-    minecraftProvider.minecraftVersion = "1.21.1"
-    forgeshadowedFiles = []
-}
-
-dependencies {
-    minecraft "com.mojang:minecraft:1.21.1"
+    minecraft "1.21.1"
     mappings loom.layered() {
         officialMojangMappings()
         parchment()
     }
+    forgeshadowedFiles = []
+}
+
+dependencies {
     modImplementation "net.fabricmc:fabric-loader:0.15.3"
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.97.0+1.21.1"
     include modImplementation("net.fabricmc.fabric-api:fabric-api:0.97.0+1.21.1")
