@@ -1,0 +1,16 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven { url 'https://maven.fabricmc.net/' }
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven { url 'https://maven.fabricmc.net/' }
+    }
+}
+
+rootProject.name = 'minewind'

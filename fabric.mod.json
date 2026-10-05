@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "minewind",
+  "version": "{{version}}",
+  "name": "Minewind",
+  "description": "Morrowind Total Conversion for Minecraft Fabric 1.21.1 - A GMod-style sandbox framework",
+  "authors": ["bladesilburwolf"],
+  "license": "All Rights Reserved",
+  "environment": "client",
+  "entrypoints": {
+    "main": ["com.minewind.MinewindMod"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.3",
+    "fabric-api": ">=0.97.0+1.21.1",
+    "minecraft": "1.21.1"
+  },
+  "suggests": {
+    "fabric-api": "*"
+  },
+  "mixins": [
+    "minewind.mixins.json"
+  ],
+  "custom": {
+    "modmenu": {
+      "description": "A total conversion mod bringing Morrowind mechanics to Minecraft",
+      "links": {
+        "github": "https://github.com/bladesilburwolf-star/Minewind"
+      }
+    }
+  }
+}
