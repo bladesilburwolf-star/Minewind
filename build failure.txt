@@ -1,0 +1,378 @@
+> Configure project :
+Fabric Loom: 1.8.12
+
+> Task :compileJava
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:111: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:130: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:154: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "getMovementSpeed", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:171: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "isInFluid", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:184: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "isTouchingWater", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:208: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "getFluidHeight", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:21: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "getMaxHealth", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:33: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "getHealth", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:45: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:75: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "heal", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:89: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "canBreatheInWater", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:101: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "getAir", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:113: warning: Unable to determine descriptor for @Inject target method
+    @Inject(method = "setAir", at = @At("HEAD"), cancellable = true)
+    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\QuestSystem.java:216: error: cannot find symbol
+            completedList.add(NbtCompound.ofString(questId));
+                                         ^
+  symbol:   method ofString(String)
+  location: class NbtCompound
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\QuestSystem.java:223: error: cannot find symbol
+            failedList.add(NbtCompound.ofString(questId));
+                                      ^
+  symbol:   method ofString(String)
+  location: class NbtCompound
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\QuestSystem.java:241: error: method getList in class NbtCompound cannot be applied to given types;
+            NbtList completedList = nbt.getList("completed_quests");
+                                       ^
+  required: String,int
+  found:    String
+  reason: actual and formal argument lists differ in length
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\QuestSystem.java:249: error: method getList in class NbtCompound cannot be applied to given types;
+            NbtList failedList = nbt.getList("failed_quests");
+                                    ^
+  required: String,int
+  found:    String
+  reason: actual and formal argument lists differ in length
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:126: error: cannot find symbol
+            if (existing.isOf(item.getItem()) && existing.getNbt() != null && existing.getNbt().equals(item.getNbt())) {
+                                                         ^
+  symbol:   method getNbt()
+  location: variable existing of type ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:126: error: cannot find symbol
+            if (existing.isOf(item.getItem()) && existing.getNbt() != null && existing.getNbt().equals(item.getNbt())) {
+                                                                                      ^
+  symbol:   method getNbt()
+  location: variable existing of type ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:126: error: cannot find symbol
+            if (existing.isOf(item.getItem()) && existing.getNbt() != null && existing.getNbt().equals(item.getNbt())) {
+                                                                                                           ^
+  symbol:   method getNbt()
+  location: variable item of type ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:223: error: cannot find symbol
+               (a.getNbt() == null && b.getNbt() == null ||
+                 ^
+  symbol:   method getNbt()
+  location: variable a of type ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:223: error: cannot find symbol
+               (a.getNbt() == null && b.getNbt() == null ||
+                                       ^
+  symbol:   method getNbt()
+  location: variable b of type ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:224: error: cannot find symbol
+                (a.getNbt() != null && a.getNbt().equals(b.getNbt())));
+                  ^
+  symbol:   method getNbt()
+  location: variable a of type ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:224: error: cannot find symbol
+                (a.getNbt() != null && a.getNbt().equals(b.getNbt())));
+                                        ^
+  symbol:   method getNbt()
+  location: variable a of type ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:224: error: cannot find symbol
+                (a.getNbt() != null && a.getNbt().equals(b.getNbt())));
+                                                          ^
+  symbol:   method getNbt()
+  location: variable b of type ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:254: error: cannot find symbol
+            item.writeNbt(itemNbt);
+                ^
+  symbol:   method writeNbt(NbtCompound)
+  location: variable item of type ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:264: error: cannot find symbol
+                entry.getValue().writeNbt(slotNbt);
+                                ^
+  symbol:   method writeNbt(NbtCompound)
+  location: class ItemStack
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:281: error: method getList in class NbtCompound cannot be applied to given types;
+            NbtList itemsList = nbt.getList("items");
+                                   ^
+  required: String,int
+  found:    String
+  reason: actual and formal argument lists differ in length
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:284: error: method fromNbt in class ItemStack cannot be applied to given types;
+                ItemStack item = ItemStack.fromNbt(itemNbt);
+                                          ^
+  required: WrapperLookup,NbtElement
+  found:    NbtCompound
+  reason: actual and formal argument lists differ in length
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:298: error: method fromNbt in class ItemStack cannot be applied to given types;
+                ItemStack item = ItemStack.fromNbt(slotNbt);
+                                          ^
+  required: WrapperLookup,NbtElement
+  found:    NbtCompound
+  reason: actual and formal argument lists differ in length
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\MinewindMod.java:58: error: cannot find symbol
+        ClientLifecycleEvents.CLIENT_STARTING.register(client -> onClientStarting());
+                             ^
+  symbol:   variable CLIENT_STARTING
+  location: class ClientLifecycleEvents
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\MinewindMod.java:62: error: incompatible types: invalid method reference
+        HudRenderCallback.EVENT.register(hudSystem::render);
+                                         ^
+    incompatible types: RenderTickCounter cannot be converted to float
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\ModelSystem.java:169: error: no suitable method found for render(MatrixStack,VertexConsumerProvider,int,int,float,float,float,float)
+                model.render(matrices, vertexConsumers, light, overlay, 1.0f, 1.0f, 1.0f, 1.0f);
+                     ^
+    method Model.render(MatrixStack,VertexConsumer,int,int,int) is not applicable
+      (actual and formal argument lists differ in length)
+    method Model.render(MatrixStack,VertexConsumer,int,int) is not applicable
+      (actual and formal argument lists differ in length)
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:57: error: jumping has protected access in LivingEntity
+        minewind$wasJumping = player.jumping;
+                                    ^
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:56: error: cannot find symbol
+        cir.cancel();
+        ^
+  symbol:   variable cir
+  location: class PlayerEntityMixin
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:82: error: cannot find symbol
+        cir.cancel();
+        ^
+  symbol:   variable cir
+  location: class PlayerEntityMixin
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:119: error: cannot find symbol
+        cir.cancel();
+        ^
+  symbol:   variable cir
+  location: class PlayerEntityMixin
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\render\CameraMixin.java:36: error: method setPos in class Camera cannot be applied to given types;
+            camera.setPos(pos.x, pos.y + minewind$viewModelBobbing * 0.05f, pos.z);
+                  ^
+  required: double,double,double
+  found:    double,double,double
+  reason: setPos(double,double,double) has protected access in Camera
+C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\render\GameRendererMixin.java:30: error: cannot find symbol
+        if (mod.getMovementSystem().isSneaking()) {
+                                   ^
+  symbol:   method isSneaking()
+  location: class MovementSystem
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+26 errors
+13 warnings
+
+> Task :compileJava FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/jwgreer/Minewind/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+> Compilation failed; see the compiler output below.
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\QuestSystem.java:241: error: method getList in class NbtCompound cannot be applied to given types;
+              NbtList completedList = nbt.getList("completed_quests");
+                                         ^
+    required: String,int
+    found:    String
+    reason: actual and formal argument lists differ in length
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\QuestSystem.java:249: error: method getList in class NbtCompound cannot be applied to given types;
+              NbtList failedList = nbt.getList("failed_quests");
+                                      ^
+    required: String,int
+    found:    String
+    reason: actual and formal argument lists differ in length
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:281: error: method getList in class NbtCompound cannot be applied to given types;
+              NbtList itemsList = nbt.getList("items");
+                                     ^
+    required: String,int
+    found:    String
+    reason: actual and formal argument lists differ in length
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:284: error: method fromNbt in class ItemStack cannot be applied to given types;
+                  ItemStack item = ItemStack.fromNbt(itemNbt);
+                                            ^
+    required: WrapperLookup,NbtElement
+    found:    NbtCompound
+    reason: actual and formal argument lists differ in length
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:298: error: method fromNbt in class ItemStack cannot be applied to given types;
+                  ItemStack item = ItemStack.fromNbt(slotNbt);
+                                            ^
+    required: WrapperLookup,NbtElement
+    found:    NbtCompound
+    reason: actual and formal argument lists differ in length
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\render\CameraMixin.java:36: error: method setPos in class Camera cannot be applied to given types;
+              camera.setPos(pos.x, pos.y + minewind$viewModelBobbing * 0.05f, pos.z);
+                    ^
+    required: double,double,double
+    found:    double,double,double
+    reason: setPos(double,double,double) has protected access in Camera
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\ModelSystem.java:169: error: no suitable method found for render(MatrixStack,VertexConsumerProvider,int,int,float,float,float,float)
+                  model.render(matrices, vertexConsumers, light, overlay, 1.0f, 1.0f, 1.0f, 1.0f);
+                       ^
+      method Model.render(MatrixStack,VertexConsumer,int,int,int) is not applicable
+        (actual and formal argument lists differ in length)
+      method Model.render(MatrixStack,VertexConsumer,int,int) is not applicable
+        (actual and formal argument lists differ in length)
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:111: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:130: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:154: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "getMovementSpeed", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:171: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "isInFluid", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:184: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "isTouchingWater", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:208: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "getFluidHeight", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:21: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "getMaxHealth", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:33: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "getHealth", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:45: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:75: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "heal", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:89: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "canBreatheInWater", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:101: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "getAir", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:113: warning: Unable to determine descriptor for @Inject target method
+      @Inject(method = "setAir", at = @At("HEAD"), cancellable = true)
+      ^
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\MinewindMod.java:62: error: incompatible types: invalid method reference
+          HudRenderCallback.EVENT.register(hudSystem::render);
+                                           ^
+      incompatible types: RenderTickCounter cannot be converted to float
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\MinewindMod.java:58: error: cannot find symbol
+          ClientLifecycleEvents.CLIENT_STARTING.register(client -> onClientStarting());
+                               ^
+    symbol:   variable CLIENT_STARTING
+    location: class ClientLifecycleEvents
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:56: error: cannot find symbol
+          cir.cancel();
+          ^
+    symbol:   variable cir
+    location: class PlayerEntityMixin
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:82: error: cannot find symbol
+          cir.cancel();
+          ^
+    symbol:   variable cir
+    location: class PlayerEntityMixin
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\PlayerEntityMixin.java:119: error: cannot find symbol
+          cir.cancel();
+          ^
+    symbol:   variable cir
+    location: class PlayerEntityMixin
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\player\ClientPlayerEntityMixin.java:57: error: jumping has protected access in LivingEntity
+          minewind$wasJumping = player.jumping;
+                                      ^
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\QuestSystem.java:216: error: cannot find symbol
+              completedList.add(NbtCompound.ofString(questId));
+                                           ^
+    symbol:   method ofString(String)
+    location: class NbtCompound
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\QuestSystem.java:223: error: cannot find symbol
+              failedList.add(NbtCompound.ofString(questId));
+                                        ^
+    symbol:   method ofString(String)
+    location: class NbtCompound
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:126: error: cannot find symbol
+              if (existing.isOf(item.getItem()) && existing.getNbt() != null && existing.getNbt().equals(item.getNbt())) {
+                                                           ^
+    symbol:   method getNbt()
+    location: variable existing of type ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:126: error: cannot find symbol
+              if (existing.isOf(item.getItem()) && existing.getNbt() != null && existing.getNbt().equals(item.getNbt())) {
+                                                                                        ^
+    symbol:   method getNbt()
+    location: variable existing of type ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:126: error: cannot find symbol
+              if (existing.isOf(item.getItem()) && existing.getNbt() != null && existing.getNbt().equals(item.getNbt())) {
+                                                                                                             ^
+    symbol:   method getNbt()
+    location: variable item of type ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:223: error: cannot find symbol
+                 (a.getNbt() == null && b.getNbt() == null ||
+                   ^
+    symbol:   method getNbt()
+    location: variable a of type ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:223: error: cannot find symbol
+                 (a.getNbt() == null && b.getNbt() == null ||
+                                         ^
+    symbol:   method getNbt()
+    location: variable b of type ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:224: error: cannot find symbol
+                  (a.getNbt() != null && a.getNbt().equals(b.getNbt())));
+                    ^
+    symbol:   method getNbt()
+    location: variable a of type ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:224: error: cannot find symbol
+                  (a.getNbt() != null && a.getNbt().equals(b.getNbt())));
+                                          ^
+    symbol:   method getNbt()
+    location: variable a of type ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:224: error: cannot find symbol
+                  (a.getNbt() != null && a.getNbt().equals(b.getNbt())));
+                                                            ^
+    symbol:   method getNbt()
+    location: variable b of type ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:254: error: cannot find symbol
+              item.writeNbt(itemNbt);
+                  ^
+    symbol:   method writeNbt(NbtCompound)
+    location: variable item of type ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\InventorySystem.java:264: error: cannot find symbol
+                  entry.getValue().writeNbt(slotNbt);
+                                  ^
+    symbol:   method writeNbt(NbtCompound)
+    location: class ItemStack
+  C:\Users\jwgreer\Minewind\src\main\java\com\minewind\mixin\render\GameRendererMixin.java:30: error: cannot find symbol
+          if (mod.getMovementSystem().isSneaking()) {
+                                     ^
+    symbol:   method isSneaking()
+    location: class MovementSystem
+  26 errors
+  13 warnings
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
