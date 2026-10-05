@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -42,7 +43,7 @@ public abstract class PlayerEntityMixin {
      * Override setHealth to prevent vanilla from modifying health directly
      */
     @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true)
-    private void onSetHealth(float health, CallbackInfoReturnable<Void> cir) {
+    private void onSetHealth(float health, CallbackInfo ci) {
         MinewindMod mod = MinewindMod.getInstance();
         if (mod == null) return;
 
@@ -72,7 +73,7 @@ public abstract class PlayerEntityMixin {
      * Override heal to use custom health system
      */
     @Inject(method = "heal", at = @At("HEAD"), cancellable = true)
-    private void onHeal(float amount, CallbackInfoReturnable<Void> cir) {
+    private void onHeal(float amount, CallbackInfo ci) {
         MinewindMod mod = MinewindMod.getInstance();
         if (mod == null) return;
 
@@ -110,7 +111,7 @@ public abstract class PlayerEntityMixin {
      * Override setAir to prevent vanilla from modifying air
      */
     @Inject(method = "setAir", at = @At("HEAD"), cancellable = true)
-    private void onSetAir(int air, CallbackInfoReturnable<Void> cir) {
+    private void onSetAir(int air, CallbackInfo ci) {
         MinewindMod mod = MinewindMod.getInstance();
         if (mod == null) return;
 
@@ -131,29 +132,4 @@ public abstract class PlayerEntityMixin {
         cir.setReturnValue(0.1f); // Base speed, will be modified by MovementSystem
     }
 
-    /**
-     * Override isSneaking to use custom movement state
-     */
-    @Inject(method = "isSneaking", at = @At("HEAD"), cancellable = true)
-    private void onIsSneaking(CallbackInfoReturnable<Boolean> cir) {
-        MinewindMod mod = MinewindMod.getInstance();
-        if (mod == null) return;
-
-        // Sneaking state is managed by MovementSystem
-        // For now, just return the vanilla value
-        // TODO: Sync with MovementSystem's sneaking state
-    }
-
-    /**
-     * Override isSprinting to use custom movement state
-     */
-    @Inject(method = "isSprinting", at = @At("HEAD"), cancellable = true)
-    private void onIsSprinting(CallbackInfoReturnable<Boolean> cir) {
-        MinewindMod mod = MinewindMod.getInstance();
-        if (mod == null) return;
-
-        // Running state is managed by MovementSystem
-        // For now, just return the vanilla value
-        // TODO: Sync with MovementSystem's running state
-    }
 }

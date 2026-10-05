@@ -4,11 +4,15 @@
   "version": "{{version}}",
   "name": "Minewind",
   "description": "Morrowind Total Conversion for Minecraft Fabric 1.21.1 - A GMod-style sandbox framework",
-  "authors": ["bladesilburwolf"],
+  "authors": [
+    "bladesilburwolf"
+  ],
   "license": "All Rights Reserved",
   "environment": "client",
   "entrypoints": {
-    "main": ["com.minewind.MinewindMod"]
+    "client": [
+      "com.minewind.MinewindMod"
+    ]
   },
   "depends": {
     "fabricloader": ">=0.15.3",

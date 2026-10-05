@@ -1,4 +1,22 @@
 # Minewind
 Morrowind World And Mechanics inside Minecraft Fabric 1.21.1.
 
-Project Context: I am building a total-conversion RPG modpack/project using Minecraft Fabric 1.21.1 as an engine/sandbox framework (similar to Garry's Mod).   Important Assumptions to Ignore:Do NOT assume standard vanilla Minecraft gameplay, block-grid building, crafting recipes, or survival mechanics.   Do NOT suggest vanilla-friendly compromises or traditional voxel builds.   Technical Scope:High-detail 3D OBJ/JSON entity models, custom viewmodels, and non-voxel terrain.   Overwritten player movement, custom combat/physics engines, and dynamic HUDs.   Full Morrowind RPG mechanics (skills, dynamic spellcasting, stat-based progression, custom dialogue UI).Treat Minecraft strictly as the low-level client/server engine driving a GMod-style Morrowind total conversion.
+## Build
+
+Minewind targets Minecraft 1.21.1, Fabric Loader 0.16.5, Fabric API 0.102.1+1.21.1, Yarn 1.21.1+build.3, Java 21, and Fabric Loom 1.7.4.
+
+The project includes a Gradle bootstrap wrapper so a machine without a preinstalled Gradle command can bootstrap Gradle 8.10.2:
+
+- Windows: `gradlew.bat build`
+- Linux/macOS: `./gradlew build`
+- Generate/refresh the standard wrapper after the first successful bootstrap with `./gradlew wrapper` or `gradlew.bat wrapper`.
+
+The source uses Fabric/Yarn names, so Yarn mappings are required; do not replace them with Mojang official mappings.
+
+## Project Context
+
+I am building a total-conversion RPG modpack/project using Minecraft Fabric 1.21.1 as an engine/sandbox framework (similar to Garry's Mod).
+
+Do NOT assume standard vanilla Minecraft gameplay, block-grid building, crafting recipes, or survival mechanics. Treat Minecraft strictly as the low-level client/server engine driving a GMod-style Morrowind total conversion.
+
+Technical scope includes high-detail 3D OBJ/JSON entity models, custom viewmodels, non-voxel terrain, overwritten player movement, custom combat/physics engines, dynamic HUDs, full Morrowind RPG mechanics, dynamic spellcasting, stat-based progression, and custom dialogue UI.
