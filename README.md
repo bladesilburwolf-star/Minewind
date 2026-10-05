@@ -3,9 +3,9 @@ Morrowind World And Mechanics inside Minecraft Fabric 1.21.1.
 
 ## Build
 
-Minewind targets Minecraft 1.21.1, Fabric Loader 0.16.5, Fabric API 0.102.1+1.21.1, Yarn 1.21.1+build.3, Java 21, and Fabric Loom 1.7.4.
+Minewind targets Minecraft 1.21.1, Fabric Loader 0.16.5, Fabric API 0.102.1+1.21.1, Yarn 1.21.1+build.3, Java 21, and Fabric Loom 1.8.12.
 
-The project includes a Gradle bootstrap wrapper so a machine without a preinstalled Gradle command can bootstrap Gradle 8.10.2:
+The project includes a Gradle bootstrap wrapper so a machine without a preinstalled Gradle command can bootstrap Gradle 9.7.1:
 
 - Windows: `gradlew.bat build`
 - Linux/macOS: `./gradlew build`
