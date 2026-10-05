@@ -6,7 +6,8 @@
     "player.ClientPlayerEntityMixin",
     "player.PlayerEntityMixin",
     "render.CameraMixin",
-    "render.GameRendererMixin"
+    "render.GameRendererMixin",
+    "world.ClientWorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1
