@@ -1,227 +1,111 @@
 package com.minewind;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.Vec3d;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Custom movement system that completely overwrites vanilla Minecraft movement
- * Implements Morrowind-style movement mechanics:
- * - No jump height restrictions
- * - Custom walking/running speeds
- * - Sneak mechanics
- * - Swimming/flying mechanics
- * - Custom physics
+ * Minewind - Morrowind Total Conversion for Minecraft Fabric 1.21.1
+ * 
+ * Core mod class that initializes all systems:
+ * - Custom entity models (OBJ/JSON)
+ * - Overwritten player movement
+ * - Custom combat/physics engines
+ * - Dynamic HUD systems
+ * - Full Morrowind RPG mechanics
  */
-public class MovementSystem {
+@Environment(EnvType.CLIENT)
+public class MinewindMod implements ClientModInitializer {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(MovementSystem.class);
+    public static final String MOD_ID = "minewind";
+    public static final String MOD_NAME = "Minewind";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     
-    // Movement constants
-    private static final float WALK_SPEED = 4.0f;
-    private static final float RUN_SPEED = 8.0f;
-    private static final float SNEAK_SPEED = 2.0f;
-    private static final float SWIM_SPEED = 3.0f;
-    private static final float FLY_SPEED = 12.0f;
-    private static final float JUMP_FORCE = 1.2f;
-    private static final float GRAVITY = 0.08f;
-    private static final float AIR_RESISTANCE = 0.98f;
-    private static final float WATER_RESISTANCE = 0.8f;
+    private static MinewindMod instance;
     
-    // Movement state
-    private boolean isRunning;
-    private boolean isSneaking;
-    private boolean isFlying;
-    private boolean isSwimming;
-    private boolean canJump;
+    private final MorrowindSystems morrowindSystems;
+    private final ModelSystem modelSystem;
+    private final MovementSystem movementSystem;
+    private final CombatSystem combatSystem;
+    private final HUDSystem hudSystem;
+    private final SpellSystem spellSystem;
     
-    // Velocity tracking
-    private Vec3d velocity;
-    private Vec3d lastPosition;
-    
-    public MovementSystem() {
-        this.isRunning = false;
-        this.isSneaking = false;
-        this.isFlying = false;
-        this.isSwimming = false;
-        this.canJump = true;
-        this.velocity = Vec3d.ZERO;
-        this.lastPosition = Vec3d.ZERO;
-    }
-    
-    public void initialize() {
-        LOGGER.info("Initializing custom movement system...");
+    public MinewindMod() {
+        instance = this;
+        LOGGER.info("Initializing {} systems...", MOD_NAME);
         
-        // Register movement handlers
-        registerMovementHandlers();
+        // Initialize all core systems
+        this.morrowindSystems = new MorrowindSystems();
+        this.modelSystem = new ModelSystem();
+        this.movementSystem = new MovementSystem();
+        this.combatSystem = new CombatSystem();
+        this.hudSystem = new HUDSystem();
+        this.spellSystem = new SpellSystem();
         
-        LOGGER.info("Custom movement system initialized");
+        LOGGER.info("{} systems initialized successfully", MOD_NAME);
     }
     
-    public void onClientStart() {
-        LOGGER.info("Movement system started");
-    }
-    
-    public void onClientStop() {
-        LOGGER.info("Movement system stopped");
-    }
-    
-    private void registerMovementHandlers() {
-        // Handlers will be registered through mixins
-        LOGGER.debug("Movement handlers registered");
-    }
-    
-    /**
-     * Update movement state based on player input
-     */
-    public void updateMovementState(ClientPlayerEntity player) {
-        this.isRunning = player.isSprinting();
-        this.isSneaking = player.isSneaking();
-        this.isFlying = player.getAbilities().flying;
-        this.isSwimming = player.isSwimming();
-    }
-    
-    /**
-     * Calculate movement velocity based on input and state
-     */
-    public Vec3d calculateMovementVelocity(ClientPlayerEntity player, Vec3d inputDirection) {
-        float speed = getCurrentSpeed(player);
+    @Override
+    public void onInitializeClient() {
+        LOGGER.info("Starting {} client initialization...", MOD_NAME);
         
-        // Calculate base velocity
-        Vec3d velocity = inputDirection.multiply(speed);
+        // Register lifecycle callbacks
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> onClientStarting());
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> onClientStopping());
         
-        // Apply environment modifiers
-        if (isSwimming) {
-            velocity = velocity.multiply(SWIM_SPEED / speed);
-        }
+        // Register HUD rendering
+        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> hudSystem.render(drawContext, 0.0f));
         
-        if (isFlying) {
-            velocity = velocity.multiply(FLY_SPEED / speed);
-        }
+        // Initialize systems
+        modelSystem.initialize();
+        movementSystem.initialize();
+        combatSystem.initialize();
+        hudSystem.initialize();
+        spellSystem.initialize();
         
-        // Apply gravity if not flying or swimming
-        if (!isFlying && !isSwimming) {
-            velocity = velocity.add(0, -GRAVITY, 0);
-        }
-        
-        // Apply resistance
-        if (!isFlying) {
-            velocity = velocity.multiply(AIR_RESISTANCE);
-        }
-        
-        if (isSwimming) {
-            velocity = velocity.multiply(WATER_RESISTANCE);
-        }
-        
-        this.velocity = velocity;
-        return velocity;
+        LOGGER.info("{} client initialization complete", MOD_NAME);
     }
     
-    /**
-     * Get current movement speed based on state
-     */
-    private float getCurrentSpeed(ClientPlayerEntity player) {
-        if (isSneaking) {
-            return SNEAK_SPEED;
-        }
-        
-        if (isRunning) {
-            return RUN_SPEED;
-        }
-        
-        return WALK_SPEED;
+    private void onClientStarting() {
+        LOGGER.info("{} client starting", MOD_NAME);
+        morrowindSystems.onClientStart();
     }
     
-    /**
-     * Handle jump action
-     */
-    public void handleJump(ClientPlayerEntity player) {
-        if (canJump && !isSwimming && !isFlying) {
-            Vec3d jumpVelocity = new Vec3d(0, JUMP_FORCE, 0);
-            this.velocity = velocity.add(jumpVelocity);
-            canJump = false;
-            LOGGER.debug("Player jumped with force: {}", JUMP_FORCE);
-        }
+    private void onClientStopping() {
+        LOGGER.info("{} client stopping", MOD_NAME);
+        morrowindSystems.onClientStop();
     }
     
-    /**
-     * Reset jump state when player lands
-     */
-    public void onLand() {
-        canJump = true;
+    public static MinewindMod getInstance() {
+        return instance;
     }
     
-    /**
-     * Update velocity based on current movement
-     */
-    public void updateVelocity(Vec3d newVelocity) {
-        this.velocity = newVelocity;
+    public MorrowindSystems getMorrowindSystems() {
+        return morrowindSystems;
     }
     
-    /**
-     * Get current velocity
-     */
-    public Vec3d getVelocity() {
-        return velocity;
+    public ModelSystem getModelSystem() {
+        return modelSystem;
     }
     
-    /**
-     * Set running state
-     */
-    public void setRunning(boolean running) {
-        this.isRunning = running;
+    public MovementSystem getMovementSystem() {
+        return movementSystem;
     }
     
-    /**
-     * Set sneaking state
-     */
-    public void setSneaking(boolean sneaking) {
-        this.isSneaking = sneaking;
+    public CombatSystem getCombatSystem() {
+        return combatSystem;
     }
     
-    /**
-     * Set flying state
-     */
-    public void setFlying(boolean flying) {
-        this.isFlying = flying;
+    public HUDSystem getHudSystem() {
+        return hudSystem;
     }
     
-    /**
-     * Set swimming state
-     */
-    public void setSwimming(boolean swimming) {
-        this.isSwimming = swimming;
-    }
-    
-    /**
-     * Check if player can jump
-     */
-    public boolean canJump() {
-        return canJump;
-    }
-    
-    /**
-     * Apply custom physics to player
-     */
-    public void applyPhysics(ClientPlayerEntity player) {
-        // Apply velocity to player
-        if (velocity.lengthSquared() > 0) {
-            player.setVelocity(velocity);
-        }
-    }
-    
-    /**
-     * Get movement multiplier based on attribute (Agility)
-     */
-    public float getMovementMultiplier() {
-        MinewindMod mod = MinewindMod.getInstance();
-        if (mod != null) {
-            AttributeSystem attributeSystem = mod.getMorrowindSystems().getAttributeSystem();
-            int agility = attributeSystem.getAttribute(MorrowindSystems.Attribute.AGILITY);
-            return 1.0f + (agility / 100.0f); // Agility increases movement speed
-        }
-        return 1.0f;
+    public SpellSystem getSpellSystem() {
+        return spellSystem;
     }
 }

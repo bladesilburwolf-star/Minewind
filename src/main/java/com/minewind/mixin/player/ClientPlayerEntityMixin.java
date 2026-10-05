@@ -1,150 +1,118 @@
 package com.minewind.mixin.player;
 
 import com.minewind.MinewindMod;
-import com.minewind.MovementSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.entity.MovementType;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Dedicated mixin for ClientPlayerEntity to completely decouple from vanilla movement physics.
- * This mixin overrides all ground/jump physics and replaces them with custom Morrowind-style movement.
+ * Mixin for PlayerEntity to override health, magicka, and other attribute-related systems.
+ * This decouples the player from vanilla health mechanics.
  */
-@Mixin(ClientPlayerEntity.class)
-public abstract class ClientPlayerEntityMixin {
-
-    @Unique
-    private boolean minewind$wasOnGround;
-
-    @Unique
-    private boolean minewind$wasJumping;
-
-    @Unique
-    private float minewind$customYaw;
-
-    @Unique
-    private float minewind$customPitch;
-
-    @Unique
-    private Vec3d minewind$customVelocity = Vec3d.ZERO;
-
-    @Unique
-    private boolean minewind$movementDecoupled = false;
+@Mixin(PlayerEntity.class)
+public abstract class PlayerEntityMixin {
 
     /**
-     * Inject at the start of tick to capture pre-tick state
+     * Override getMaxHealth to use Morrowind's attribute-based health system
      */
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void onTickStart(CallbackInfo ci) {
-        ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
+    @Inject(method = "getMaxHealth", at = @At("HEAD"), cancellable = true)
+    private void onGetMaxHealth(CallbackInfoReturnable<Float> cir) {
         MinewindMod mod = MinewindMod.getInstance();
-        
         if (mod == null) return;
 
-        MovementSystem movementSystem = mod.getMovementSystem();
-        
-        // Capture previous state
-        minewind$wasOnGround = player.isOnGround();
-        minewind$wasJumping = player.jumping;
-        
-        // Store current rotation for custom camera control
-        minewind$customYaw = player.getYaw();
-        minewind$customPitch = player.getPitch();
-        
-        // Sync movement system with player state
-        movementSystem.updateMovementState(player);
-        
-        // Mark that we're decoupling movement
-        minewind$movementDecoupled = true;
+        float health = mod.getMorrowindSystems().getAttributeSystem().getHealth();
+        cir.setReturnValue(health);
     }
 
     /**
-     * Inject at the end of tick to apply custom movement after vanilla processing
+     * Override getHealth to use Morrowind's attribute-based health system
      */
-    @Inject(method = "tick", at = @At("RETURN"))
-    private void onTickEnd(CallbackInfo ci) {
-        ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
+    @Inject(method = "getHealth", at = @At("HEAD"), cancellable = true)
+    private void onGetHealth(CallbackInfoReturnable<Float> cir) {
         MinewindMod mod = MinewindMod.getInstance();
-        
         if (mod == null) return;
 
-        MovementSystem movementSystem = mod.getMovementSystem();
-        
-        // Handle landing detection
-        if (minewind$wasOnGround && !player.isOnGround()) {
-            // Player just left ground
-        } else if (!minewind$wasOnGround && player.isOnGround()) {
-            // Player just landed
-            movementSystem.onLand();
-        }
-        
-        // Apply custom physics
-        Vec3d customVelocity = movementSystem.getVelocity();
-        if (customVelocity.lengthSquared() > 0) {
-            // Only apply custom velocity if movement system has set one
-            // This allows gradual transition from vanilla to custom physics
-            player.setVelocity(customVelocity);
-        }
-        
-        // Update combat system
-        mod.getCombatSystem().tick(player);
-        
-        // Update spell system
-        mod.getSpellSystem().tick(player);
-        
-        // Update Morrowind systems
-        mod.getMorrowindSystems().onTick(MinecraftClient.getInstance());
+        float health = mod.getMorrowindSystems().getAttributeSystem().getHealth();
+        cir.setReturnValue(health);
     }
 
     /**
-     * Override jump method entirely to prevent vanilla jump logic
+     * Override setHealth to prevent vanilla from modifying health directly
      */
-    @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
-    private void onJump(CallbackInfo ci) {
+    @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true)
+    private void onSetHealth(float health, CallbackInfo ci) {
         MinewindMod mod = MinewindMod.getInstance();
         if (mod == null) return;
 
-        ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
-        MovementSystem movementSystem = mod.getMovementSystem();
-        
-        // Use custom jump logic
-        movementSystem.handleJump(player);
-        
-        // Cancel vanilla jump processing
+        // In Morrowind, health is managed by the AttributeSystem
+        // We'll handle health changes through our own systems
+        // For now, just prevent vanilla from setting health directly
         ci.cancel();
     }
 
     /**
-     * Override travel method to completely decouple from vanilla movement physics
-     * This is where vanilla handles ground movement, swimming, flying, etc.
+     * Override damage to use custom combat system
      */
-    @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
-    private void onTravel(Vec3d movementInput, CallbackInfo ci) {
+    @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
+    private void onDamage(CallbackInfoReturnable<Boolean> cir) {
         MinewindMod mod = MinewindMod.getInstance();
         if (mod == null) return;
 
-        ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
-        MovementSystem movementSystem = mod.getMovementSystem();
-        
-        // Calculate custom movement based on input
-        Vec3d customVelocity = movementSystem.calculateMovementVelocity(player, movementInput);
-        
-        // Apply the custom velocity
-        player.setVelocity(customVelocity);
-        
-        // Mark that we've applied custom movement
-        minewind$customVelocity = customVelocity;
-        
-        // Cancel vanilla travel processing
+        // Custom damage handling will be implemented in CombatSystem
+        // For now, just log and allow damage
+        // TODO: Implement custom damage calculation based on skills/attributes
+    }
+
+    /**
+     * Override heal to use custom health system
+     */
+    @Inject(method = "heal", at = @At("HEAD"), cancellable = true)
+    private void onHeal(float amount, CallbackInfo ci) {
+        MinewindMod mod = MinewindMod.getInstance();
+        if (mod == null) return;
+
+        // Health regeneration is handled by our AttributeSystem
+        // Restoration spells will handle healing
+        ci.cancel();
+    }
+
+    /**
+     * Override canBreatheInWater to allow underwater exploration without drowning
+     * Morrowind doesn't have a breathing mechanic
+     */
+    @Inject(method = "canBreatheInWater", at = @At("HEAD"), cancellable = true)
+    private void onCanBreatheInWater(CallbackInfoReturnable<Boolean> cir) {
+        MinewindMod mod = MinewindMod.getInstance();
+        if (mod == null) return;
+
+        // In Morrowind, players can swim/breathe underwater indefinitely
+        cir.setReturnValue(true);
+    }
+
+    /**
+     * Override getAir to prevent drowning
+     */
+    @Inject(method = "getAir", at = @At("HEAD"), cancellable = true)
+    private void onGetAir(CallbackInfoReturnable<Integer> cir) {
+        MinewindMod mod = MinewindMod.getInstance();
+        if (mod == null) return;
+
+        // Always return max air to prevent drowning
+        cir.setReturnValue(300); // Default max air
+    }
+
+    /**
+     * Override setAir to prevent vanilla from modifying air
+     */
+    @Inject(method = "setAir", at = @At("HEAD"), cancellable = true)
+    private void onSetAir(int air, CallbackInfo ci) {
+        MinewindMod mod = MinewindMod.getInstance();
+        if (mod == null) return;
+
+        // Prevent vanilla from reducing air
         ci.cancel();
     }
 
@@ -156,62 +124,9 @@ public abstract class ClientPlayerEntityMixin {
         MinewindMod mod = MinewindMod.getInstance();
         if (mod == null) return;
 
-        MovementSystem movementSystem = mod.getMovementSystem();
-        float multiplier = movementSystem.getMovementMultiplier();
-        
-        // Base speed - this will be modified by the movement system
-        float baseSpeed = 0.1f;
-        
-        cir.setReturnValue(baseSpeed * multiplier);
-    }
-
-    /**
-     * Override isInFluid to prevent vanilla from applying fluid physics
-     */
-    @Inject(method = "isInFluid", at = @At("HEAD"), cancellable = true)
-    private void onIsInFluid(CallbackInfoReturnable<Boolean> cir) {
-        MinewindMod mod = MinewindMod.getInstance();
-        if (mod == null) return;
-
-        // Return false to prevent vanilla fluid physics
-        // Our movement system handles swimming separately
-        cir.setReturnValue(false);
-    }
-
-    /**
-     * Override isTouchingWater to prevent vanilla water physics
-     */
-    @Inject(method = "isTouchingWater", at = @At("HEAD"), cancellable = true)
-    private void onIsTouchingWater(CallbackInfoReturnable<Boolean> cir) {
-        MinewindMod mod = MinewindMod.getInstance();
-        if (mod == null) return;
-
-        // Return false to prevent vanilla water physics
-        cir.setReturnValue(false);
-    }
-
-    /**
-     * Override isSubmergedInWater to prevent vanilla water physics
-     */
-    @Inject(method = "isSubmergedInWater", at = @At("HEAD"), cancellable = true)
-    private void onIsSubmergedInWater(CallbackInfoReturnable<Boolean> cir) {
-        MinewindMod mod = MinewindMod.getInstance();
-        if (mod == null) return;
-
-        // Return false to prevent vanilla water physics
-        cir.setReturnValue(false);
-    }
-
-    /**
-     * Override getFluidHeight to prevent vanilla fluid physics
-     */
-    @Inject(method = "getFluidHeight", at = @At("HEAD"), cancellable = true)
-    private void onGetFluidHeight(CallbackInfoReturnable<Double> cir) {
-        MinewindMod mod = MinewindMod.getInstance();
-        if (mod == null) return;
-
-        // Return 0 to prevent vanilla fluid physics
-        cir.setReturnValue(0.0);
+        // Movement speed is handled by MovementSystem
+        // This is a fallback for any vanilla code that checks movement speed
+        cir.setReturnValue(0.1f); // Base speed, will be modified by MovementSystem
     }
 
 }

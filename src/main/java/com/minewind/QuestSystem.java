@@ -1,8 +1,12 @@
 package com.minewind;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,466 +16,318 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Morrowind quest system
- * Manages quests, objectives, and quest state
+ * Custom inventory system for Morrowind-style inventory management
+ * Features:
+ * - Weight-based inventory limits
+ * - Equipment slots
+ * - Stacking rules
+ * - Custom items
  */
-public class QuestSystem {
+public class InventorySystem {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(QuestSystem.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InventorySystem.class);
     
-    private final Map<String, Quest> activeQuests;
-    private final List<String> completedQuests;
-    private final List<String> failedQuests;
-    private Quest currentQuest;
+    // Inventory constants
+    private static final int DEFAULT_SLOTS = 64;
+    private static final float DEFAULT_WEIGHT_LIMIT = 100.0f;
+    private static final int MAX_STACK_SIZE = 64;
     
-    public QuestSystem() {
-        this.activeQuests = new HashMap<>();
-        this.completedQuests = new ArrayList<>();
-        this.failedQuests = new ArrayList<>();
-        this.currentQuest = null;
+    // Inventory state
+    private final List<ItemStack> items;
+    private final Map<EquipmentSlot, ItemStack> equipment;
+    private float currentWeight;
+    private float weightLimit;
+    
+    public InventorySystem() {
+        this.items = new ArrayList<>();
+        this.equipment = new HashMap<>();
+        this.currentWeight = 0.0f;
+        this.weightLimit = DEFAULT_WEIGHT_LIMIT;
+        
+        // Initialize equipment slots
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            equipment.put(slot, ItemStack.EMPTY);
+        }
     }
     
     public void onClientStart() {
-        LOGGER.info("Quest system started");
+        LOGGER.info("Inventory system started");
     }
     
     public void onClientStop() {
-        LOGGER.info("Quest system stopped");
+        LOGGER.info("Inventory system stopped");
+        items.clear();
+        equipment.clear();
     }
     
     public void tick(ClientPlayerEntity player) {
-        // Update active quests
-        for (Quest quest : activeQuests.values()) {
-            quest.tick(player);
+        // Update weight limit based on Strength
+        MinewindMod mod = MinewindMod.getInstance();
+        if (mod != null) {
+            AttributeSystem attributeSystem = mod.getMorrowindSystems().getAttributeSystem();
+            weightLimit = attributeSystem.getCarryWeight();
         }
     }
     
     /**
-     * Start a new quest
+     * Add an item to inventory
      */
-    public void startQuest(Quest quest) {
-        if (quest == null) {
-            return;
+    public boolean addItem(ItemStack item) {
+        if (item == null || item.isEmpty()) {
+            return false;
         }
         
-        String questId = quest.getId();
-        if (activeQuests.containsKey(questId)) {
-            LOGGER.warn("Quest already active: {}", questId);
-            return;
+        float itemWeight = getItemWeight(item);
+        
+        // Check weight limit
+        if (currentWeight + itemWeight > weightLimit) {
+            LOGGER.warn("Cannot add item: inventory over weight limit");
+            return false;
         }
         
-        if (completedQuests.contains(questId)) {
-            LOGGER.warn("Quest already completed: {}", questId);
-            return;
+        // Try to stack with existing items
+        for (ItemStack existing : items) {
+            if (canStack(existing, item) && existing.getCount() < MAX_STACK_SIZE) {
+                int space = MAX_STACK_SIZE - existing.getCount();
+                int toAdd = Math.min(space, item.getCount());
+                
+                existing.increment(toAdd);
+                currentWeight += itemWeight * toAdd / item.getCount();
+                
+                if (toAdd >= item.getCount()) {
+                    return true;
+                }
+                
+                // Create new stack for remaining items
+                ItemStack remaining = item.copy();
+                remaining.setCount(item.getCount() - toAdd);
+                item = remaining;
+            }
         }
         
-        activeQuests.put(questId, quest);
-        currentQuest = quest;
-        
-        LOGGER.info("Started quest: {}", questId);
-        quest.onStart();
-    }
-    
-    /**
-     * Complete a quest
-     */
-    public void completeQuest(String questId) {
-        Quest quest = activeQuests.get(questId);
-        if (quest == null) {
-            LOGGER.warn("Cannot complete unknown quest: {}", questId);
-            return;
+        // Add as new item
+        if (items.size() < DEFAULT_SLOTS) {
+            items.add(item.copy());
+            currentWeight += itemWeight;
+            return true;
         }
         
-        quest.onComplete();
-        activeQuests.remove(questId);
-        completedQuests.add(questId);
-        
-        if (currentQuest != null && currentQuest.getId().equals(questId)) {
-            currentQuest = null;
+        LOGGER.warn("Cannot add item: inventory full");
+        return false;
+    }
+    
+    /**
+     * Remove an item from inventory
+     */
+    public boolean removeItem(ItemStack item, int count) {
+        if (item == null || item.isEmpty()) {
+            return false;
         }
         
-        LOGGER.info("Completed quest: {}", questId);
-    }
-    
-    /**
-     * Fail a quest
-     */
-    public void failQuest(String questId) {
-        Quest quest = activeQuests.get(questId);
-        if (quest == null) {
-            LOGGER.warn("Cannot fail unknown quest: {}", questId);
-            return;
+        for (int i = 0; i < items.size(); i++) {
+            ItemStack existing = items.get(i);
+            if (existing.isOf(item.getItem()) && ItemStack.canCombine(existing, item)) {
+                if (existing.getCount() <= count) {
+                    currentWeight -= getItemWeight(existing);
+                    items.remove(i);
+                    return true;
+                } else {
+                    existing.decrement(count);
+                    currentWeight -= getItemWeight(existing) * count / existing.getCount();
+                    return true;
+                }
+            }
         }
         
-        quest.onFail();
-        activeQuests.remove(questId);
-        failedQuests.add(questId);
-        
-        if (currentQuest != null && currentQuest.getId().equals(questId)) {
-            currentQuest = null;
+        return false;
+    }
+    
+    /**
+     * Equip an item
+     */
+    public boolean equipItem(EquipmentSlot slot, ItemStack item) {
+        if (item == null || item.isEmpty()) {
+            return false;
         }
         
-        LOGGER.info("Failed quest: {}", questId);
-    }
-    
-    /**
-     * Abandon a quest
-     */
-    public void abandonQuest(String questId) {
-        Quest quest = activeQuests.get(questId);
-        if (quest == null) {
-            LOGGER.warn("Cannot abandon unknown quest: {}", questId);
-            return;
+        // Check if item can be equipped in this slot
+        if (!canEquip(slot, item)) {
+            return false;
         }
         
-        quest.onAbandon();
-        activeQuests.remove(questId);
-        
-        if (currentQuest != null && currentQuest.getId().equals(questId)) {
-            currentQuest = null;
+        // Unequip current item
+        ItemStack current = equipment.get(slot);
+        if (!current.isEmpty()) {
+            addItem(current);
         }
         
-        LOGGER.info("Abandoned quest: {}", questId);
+        // Equip new item
+        equipment.put(slot, item.copy());
+        item.setCount(0);
+        
+        LOGGER.debug("Equipped {} in slot {}", item.getName().getString(), slot.name());
+        return true;
     }
     
     /**
-     * Get active quest by ID
+     * Unequip an item
      */
-    public Quest getQuest(String questId) {
-        return activeQuests.get(questId);
+    public ItemStack unequipItem(EquipmentSlot slot) {
+        ItemStack item = equipment.get(slot);
+        if (item.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        
+        equipment.put(slot, ItemStack.EMPTY);
+        LOGGER.debug("Unequipped {} from slot {}", item.getName().getString(), slot.name());
+        return item;
     }
     
     /**
-     * Get all active quests
+     * Get equipped item in a slot
      */
-    public Map<String, Quest> getActiveQuests() {
-        return new HashMap<>(activeQuests);
+    public ItemStack getEquipped(EquipmentSlot slot) {
+        return equipment.getOrDefault(slot, ItemStack.EMPTY);
     }
     
     /**
-     * Get completed quests
+     * Get all items in inventory
      */
-    public List<String> getCompletedQuests() {
-        return new ArrayList<>(completedQuests);
+    public List<ItemStack> getItems() {
+        return new ArrayList<>(items);
     }
     
     /**
-     * Get failed quests
+     * Get current weight
      */
-    public List<String> getFailedQuests() {
-        return new ArrayList<>(failedQuests);
+    public float getCurrentWeight() {
+        return currentWeight;
     }
     
     /**
-     * Get current quest
+     * Get weight limit
      */
-    public Quest getCurrentQuest() {
-        return currentQuest;
+    public float getWeightLimit() {
+        return weightLimit;
     }
     
     /**
-     * Set current quest
+     * Get weight percentage (0-1)
      */
-    public void setCurrentQuest(String questId) {
-        currentQuest = activeQuests.get(questId);
+    public float getWeightPercentage() {
+        return currentWeight / weightLimit;
     }
     
     /**
-     * Check if quest is active
+     * Check if item can be stacked with another
      */
-    public boolean isQuestActive(String questId) {
-        return activeQuests.containsKey(questId);
+    private boolean canStack(ItemStack a, ItemStack b) {
+        return a.isOf(b.getItem()) && ItemStack.canCombine(a, b);
     }
     
     /**
-     * Check if quest is completed
+     * Check if item can be equipped in a slot
      */
-    public boolean isQuestCompleted(String questId) {
-        return completedQuests.contains(questId);
+    private boolean canEquip(EquipmentSlot slot, ItemStack item) {
+        // Implementation would check item type against slot type
+        return true;
     }
     
     /**
-     * Check if quest is failed
+     * Get weight of an item
      */
-    public boolean isQuestFailed(String questId) {
-        return failedQuests.contains(questId);
+    private float getItemWeight(ItemStack item) {
+        // Implementation would get weight from custom item data
+        // For now, return 1.0 for all items
+        return 1.0f;
     }
     
     /**
-     * Save quest data to NBT
+     * Save inventory to NBT
      */
     public NbtCompound saveToNbt() {
         NbtCompound nbt = new NbtCompound();
         
-        // Save active quests
-        NbtList activeQuestsList = new NbtList();
-        for (Quest quest : activeQuests.values()) {
-            activeQuestsList.add(quest.saveToNbt());
+        // Save items
+        NbtList itemsList = new NbtList();
+        for (ItemStack item : items) {
+            NbtCompound itemNbt = new NbtCompound();
+            itemNbt.putString("id", Registries.ITEM.getId(item.getItem()).toString());
+            itemNbt.putInt("count", item.getCount());
+            itemsList.add(itemNbt);
         }
-        nbt.put("active_quests", activeQuestsList);
+        nbt.put("items", itemsList);
         
-        // Save completed quests
-        NbtList completedList = new NbtList();
-        for (String questId : completedQuests) {
-            completedList.add(NbtCompound.ofString(questId));
+        // Save equipment
+        NbtCompound equipmentNbt = new NbtCompound();
+        for (Map.Entry<EquipmentSlot, ItemStack> entry : equipment.entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                NbtCompound slotNbt = new NbtCompound();
+                ItemStack value = entry.getValue();
+                slotNbt.putString("id", Registries.ITEM.getId(value.getItem()).toString());
+                slotNbt.putInt("count", value.getCount());
+                equipmentNbt.put(entry.getKey().name(), slotNbt);
+            }
         }
-        nbt.put("completed_quests", completedList);
+        nbt.put("equipment", equipmentNbt);
         
-        // Save failed quests
-        NbtList failedList = new NbtList();
-        for (String questId : failedQuests) {
-            failedList.add(NbtCompound.ofString(questId));
-        }
-        nbt.put("failed_quests", failedList);
-        
-        // Save current quest
-        if (currentQuest != null) {
-            nbt.putString("current_quest", currentQuest.getId());
-        }
+        nbt.putFloat("current_weight", currentWeight);
         
         return nbt;
     }
     
     /**
-     * Load quest data from NBT
+     * Load inventory from NBT
      */
     public void loadFromNbt(NbtCompound nbt) {
-        // Load completed quests
-        if (nbt.contains("completed_quests")) {
-            NbtList completedList = nbt.getList("completed_quests");
-            for (int i = 0; i < completedList.size(); i++) {
-                completedQuests.add(completedList.getString(i));
-            }
-        }
-        
-        // Load failed quests
-        if (nbt.contains("failed_quests")) {
-            NbtList failedList = nbt.getList("failed_quests");
-            for (int i = 0; i < failedList.size(); i++) {
-                failedQuests.add(failedList.getString(i));
-            }
-        }
-        
-        // Load current quest
-        if (nbt.contains("current_quest")) {
-            String currentQuestId = nbt.getString("current_quest");
-            currentQuest = activeQuests.get(currentQuestId);
-        }
-    }
-    
-    /**
-     * Quest representation
-     */
-    public static class Quest {
-        private final String id;
-        private final String name;
-        private final String description;
-        private final String giver;
-        private final QuestType type;
-        private final List<QuestObjective> objectives;
-        private int currentObjectiveIndex;
-        private QuestStatus status;
-        private final Map<String, Object> data;
-        
-        public Quest(String id, String name, String description, String giver, QuestType type) {
-            this.id = id;
-            this.name = name;
-            this.description = description;
-            this.giver = giver;
-            this.type = type;
-            this.objectives = new ArrayList<>();
-            this.currentObjectiveIndex = 0;
-            this.status = QuestStatus.ACTIVE;
-            this.data = new HashMap<>();
-        }
-        
-        public void tick(ClientPlayerEntity player) {
-            // Update current objective
-            if (currentObjectiveIndex < objectives.size()) {
-                QuestObjective objective = objectives.get(currentObjectiveIndex);
-                if (objective.isComplete(player)) {
-                    currentObjectiveIndex++;
-                    objective.onComplete();
-                    
-                    if (currentObjectiveIndex >= objectives.size()) {
-                        status = QuestStatus.COMPLETE;
-                    }
+        // Load items
+        if (nbt.contains("items")) {
+            NbtList itemsList = nbt.getList("items", 10);
+            for (int i = 0; i < itemsList.size(); i++) {
+                NbtCompound itemNbt = itemsList.getCompound(i);
+                String itemId = itemNbt.getString("id");
+                Item item = Registries.ITEM.get(Identifier.tryParse(itemId));
+                if (item != null) {
+                    int count = itemNbt.getInt("count");
+                    ItemStack itemStack = new ItemStack(item, count);
+                    items.add(itemStack);
+                    currentWeight += getItemWeight(itemStack);
                 }
             }
         }
         
-        public void onStart() {
-            // Called when quest starts
-            LOGGER.debug("Quest started: {}", id);
-        }
-        
-        public void onComplete() {
-            // Called when quest completes
-            LOGGER.debug("Quest completed: {}", id);
-        }
-        
-        public void onFail() {
-            // Called when quest fails
-            LOGGER.debug("Quest failed: {}", id);
-        }
-        
-        public void onAbandon() {
-            // Called when quest is abandoned
-            LOGGER.debug("Quest abandoned: {}", id);
-        }
-        
-        public String getId() {
-            return id;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public String getDescription() {
-            return description;
-        }
-        
-        public String getGiver() {
-            return giver;
-        }
-        
-        public QuestType getType() {
-            return type;
-        }
-        
-        public List<QuestObjective> getObjectives() {
-            return new ArrayList<>(objectives);
-        }
-        
-        public void addObjective(QuestObjective objective) {
-            objectives.add(objective);
-        }
-        
-        public QuestObjective getCurrentObjective() {
-            if (currentObjectiveIndex < objectives.size()) {
-                return objectives.get(currentObjectiveIndex);
+        // Load equipment
+        if (nbt.contains("equipment")) {
+            NbtCompound equipmentNbt = nbt.getCompound("equipment");
+            for (String key : equipmentNbt.getKeys()) {
+                EquipmentSlot slot = EquipmentSlot.valueOf(key);
+                NbtCompound slotNbt = equipmentNbt.getCompound(key);
+                String itemId = slotNbt.getString("id");
+                Item item = Registries.ITEM.get(Identifier.tryParse(itemId));
+                if (item != null) {
+                    ItemStack itemStack = new ItemStack(item, slotNbt.getInt("count"));
+                    equipment.put(slot, itemStack);
+                }
             }
-            return null;
         }
         
-        public int getCurrentObjectiveIndex() {
-            return currentObjectiveIndex;
-        }
-        
-        public QuestStatus getStatus() {
-            return status;
-        }
-        
-        public void setStatus(QuestStatus status) {
-            this.status = status;
-        }
-        
-        public Object getData(String key) {
-            return data.get(key);
-        }
-        
-        public void setData(String key, Object value) {
-            data.put(key, value);
-        }
-        
-        public NbtCompound saveToNbt() {
-            NbtCompound nbt = new NbtCompound();
-            nbt.putString("id", id);
-            nbt.putString("name", name);
-            nbt.putString("description", description);
-            nbt.putString("giver", giver);
-            nbt.putString("type", type.name());
-            nbt.putInt("current_objective", currentObjectiveIndex);
-            nbt.putString("status", status.name());
-            
-            // Save objectives
-            NbtList objectivesList = new NbtList();
-            for (QuestObjective objective : objectives) {
-                objectivesList.add(objective.saveToNbt());
-            }
-            nbt.put("objectives", objectivesList);
-            
-            return nbt;
+        if (nbt.contains("current_weight")) {
+            currentWeight = nbt.getFloat("current_weight");
         }
     }
     
     /**
-     * Quest objective
+     * Equipment slots
      */
-    public static class QuestObjective {
-        private final String id;
-        private final String description;
-        private final ObjectiveType type;
-        private boolean completed;
-        private final Map<String, Object> data;
-        
-        public QuestObjective(String id, String description, ObjectiveType type) {
-            this.id = id;
-            this.description = description;
-            this.type = type;
-            this.completed = false;
-            this.data = new HashMap<>();
-        }
-        
-        public boolean isComplete(ClientPlayerEntity player) {
-            // Check if objective is complete
-            // Implementation depends on objective type
-            return completed;
-        }
-        
-        public void onComplete() {
-            completed = true;
-            LOGGER.debug("Objective completed: {}", id);
-        }
-        
-        public String getId() {
-            return id;
-        }
-        
-        public String getDescription() {
-            return description;
-        }
-        
-        public ObjectiveType getType() {
-            return type;
-        }
-        
-        public boolean isCompleted() {
-            return completed;
-        }
-        
-        public void setCompleted(boolean completed) {
-            this.completed = completed;
-        }
-        
-        public Object getData(String key) {
-            return data.get(key);
-        }
-        
-        public void setData(String key, Object value) {
-            data.put(key, value);
-        }
-        
-        public NbtCompound saveToNbt() {
-            NbtCompound nbt = new NbtCompound();
-            nbt.putString("id", id);
-            nbt.putString("description", description);
-            nbt.putString("type", type.name());
-            nbt.putBoolean("completed", completed);
-            return nbt;
-        }
-    }
-    
-    public enum QuestType {
-        MAIN, SIDE, GUILD, FACTION, MISC
-    }
-    
-    public enum QuestStatus {
-        ACTIVE, COMPLETE, FAILED, ABANDONED
-    }
-    
-    public enum ObjectiveType {
-        KILL, COLLECT, TALK, GO_TO, USE, DELIVER, ESCORT, SURVIVE, DISCOVER
+    public enum EquipmentSlot {
+        HEAD,
+        NECK,
+        BODY,
+        ROBE,
+        RIGHT_HAND,
+        LEFT_HAND,
+        RIGHT_RING,
+        LEFT_RING,
+        AMULET
     }
 }

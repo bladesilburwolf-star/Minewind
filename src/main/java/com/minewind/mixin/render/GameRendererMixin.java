@@ -1,45 +1,65 @@
 package com.minewind.mixin.render;
 
 import com.minewind.MinewindMod;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.world.BlockView;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Morrowind-style camera effects that are safe to apply at the renderer level.
+ * Applies custom first-person camera effects after vanilla has established the
+ * camera. The update signature is the 1.21.1 five-argument Camera API.
  */
-@Mixin(GameRenderer.class)
-public abstract class GameRendererMixin {
+@Mixin(Camera.class)
+public abstract class CameraMixin {
+    @Unique private float minewind$customYaw;
+    @Unique private float minewind$customPitch;
+    @Unique private float minewind$customRoll;
+    @Unique private float minewind$viewModelBobbing;
+    @Unique private float minewind$viewModelSwing;
 
-    @Inject(method = "getFov", at = @At("HEAD"), cancellable = true)
-    private void minewind$modifyFov(Camera camera, float tickDelta, boolean changingFov,
-                                     CallbackInfoReturnable<Double> cir) {
+    @Inject(method = "update", at = @At("TAIL"))
+    private void minewind$updateCamera(BlockView area, Entity focusedEntity, boolean thirdPerson,
+                                        boolean inverseView, float tickDelta, CallbackInfo ci) {
         MinewindMod mod = MinewindMod.getInstance();
-        if (mod == null) return;
+        if (mod == null || focusedEntity == null || thirdPerson) return;
 
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null) return;
-
-        double fov = 70.0;
-        if (mod.getMovementSystem().isSneaking()) {
-            fov -= 10.0;
-        }
-        if (mod.getSpellSystem().isCasting()) {
-            fov -= mod.getSpellSystem().getCastProgress() * 20.0;
-        }
-        cir.setReturnValue(fov);
+        updateViewModelAnimations(focusedEntity, tickDelta);
     }
 
-    @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
-    private void minewind$disableVanillaBob(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
-        if (MinewindMod.getInstance() != null) {
-            ci.cancel();
+    @Unique
+    private void updateViewModelAnimations(Entity focusedEntity, float tickDelta) {
+        double horizontalSpeed = Math.sqrt(
+            focusedEntity.getVelocity().x * focusedEntity.getVelocity().x +
+            focusedEntity.getVelocity().z * focusedEntity.getVelocity().z);
+        float intensity = Math.min((float) horizontalSpeed * 0.1f, 0.3f);
+        minewind$viewModelBobbing = (float) Math.sin((focusedEntity.age + tickDelta) * 0.35f) * intensity;
+
+        MinewindMod mod = MinewindMod.getInstance();
+        if (mod.getCombatSystem().isAttacking()) {
+            float progress = mod.getCombatSystem().getAttackAnimationProgress();
+            minewind$viewModelSwing = (float) Math.sin(progress * Math.PI) * 0.5f;
+        } else {
+            minewind$viewModelSwing *= 0.9f;
         }
+    }
+
+    public void setCustomYaw(float yaw) { minewind$customYaw = yaw; }
+    public void setCustomPitch(float pitch) { minewind$customPitch = pitch; }
+    public void setCustomRoll(float roll) { minewind$customRoll = roll; }
+
+    public void resetCustomTransformations() {
+        minewind$customYaw = 0.0f;
+        minewind$customPitch = 0.0f;
+        minewind$customRoll = 0.0f;
+    }
+
+    public boolean isCameraDecoupled() {
+        return MinewindMod.getInstance() != null;
     }
 }
