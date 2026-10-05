@@ -1,2 +1,4 @@
 # Minewind
 Morrowind World And Mechanics inside Minecraft Fabric 1.21.1.
+
+Project Context: I am building a total-conversion RPG modpack/project using Minecraft Fabric 1.21.1 as an engine/sandbox framework (similar to Garry's Mod).   Important Assumptions to Ignore:Do NOT assume standard vanilla Minecraft gameplay, block-grid building, crafting recipes, or survival mechanics.   Do NOT suggest vanilla-friendly compromises or traditional voxel builds.   Technical Scope:High-detail 3D OBJ/JSON entity models, custom viewmodels, and non-voxel terrain.   Overwritten player movement, custom combat/physics engines, and dynamic HUDs.   Full Morrowind RPG mechanics (skills, dynamic spellcasting, stat-based progression, custom dialogue UI).Treat Minecraft strictly as the low-level client/server engine driving a GMod-style Morrowind total conversion.
