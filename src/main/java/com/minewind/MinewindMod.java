@@ -11,6 +11,8 @@ public class MinewindMod implements ModInitializer {
     @Override
     public void onInitialize() {
         ModItems.register();
+        MorrowindWeapons.register();
+        ModEntities.register();
         LOGGER.info("Minewind loaded");
     }
 }

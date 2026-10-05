@@ -8,7 +8,8 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.minewind.MinewindMod"]
+    "main": ["com.minewind.MinewindMod"],
+    "client": ["com.minewind.client.MinewindClient"]
   },
   "depends": {
     "minecraft": "1.21.1",
